@@ -4,23 +4,17 @@ const app = express();
 const port = process.env.PORT || 3001;
 const nginxUrl = process.env.NGINX_URL || 'http://localhost:80';
 const shippingUrl = `${nginxUrl}/shipping`;
+const got = require('got');
 
-async function requestRetry (retryCount = 0, maxRetryCount = 1) {
-  
-  retryCount++;
+async function requestRetry (maxRetryCount = 1) {
   let response;
-
   try {
-    response = await requestPromise(shippingUrl);
+    response = await got(shippingUrl, { retry: maxRetryCount }).json();
   } catch(err) {
-    if(retryCount <= maxRetryCount) {
-      console.info(`Executando Retry ${retryCount}`);
-      return await requestRetry(retryCount, maxRetryCount);
-    } else {
-      throw err;
-    }
+    console.error('Error to request /shipping => ', err);
+    throw err;
   }
-  return response;
+  return response
 }
 
 app.get('/get', async (req, res) => {
