@@ -11,6 +11,7 @@ services:
       - "3001:3000"
     environment:
       PORT: 3000
+      IS_RETURN_200: 1
     networks:
       - app-network
   
@@ -24,6 +25,7 @@ services:
       - "3002:3000"
     environment:
       PORT: 3000
+      IS_RETURN_200: 0
     networks:
       - app-network
   
@@ -37,6 +39,22 @@ services:
     depends_on:
       - app1_instancia1
       - app1_instancia2
+    networks:
+      - app-network
+  
+  app2_instancia1:
+    build:
+      context: .
+      dockerfile: app2/Dockerfile
+    image: pos-facef/app2:v1.0.0
+    restart: always
+    ports:
+      - "3003:3000"
+    environment:
+      PORT: 3000
+      NGINX_URL: "http://nginx:80"
+    depends_on:
+      - nginx
     networks:
       - app-network
 
