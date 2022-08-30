@@ -5,6 +5,30 @@ const port = process.env.PORT || 3001;
 const nginxUrl = process.env.NGINX_URL || 'http://localhost:80';
 const shippingUrl = `${nginxUrl}/shipping`;
 const got = require('got');
+const CircuitBreaker = require('opossum');
+
+const circuitBreakerOptions = {
+  timeout: 5000,
+  errorThresholdPercentage: 10,
+  resetTimeout: 10000
+};
+
+const breaker = new CircuitBreaker(requestRetry, circuitBreakerOptions);
+breaker.on('open', () => console.log(`OPEN: The breaker`));
+breaker.on('halfOpen', () => console.log(`HALF_OPEN: The breaker`));
+breaker.on('close', () => console.log(`CLOSE: The breaker`));
+
+breaker.fallback(() => {
+  console.info('Fallback Executado');
+  return {
+    data: {
+      value: 100
+    },
+    meta: {
+      server: 'localhost'
+    }
+  };
+});
 
 async function requestRetry (maxRetryCount = 1) {
   let response;
