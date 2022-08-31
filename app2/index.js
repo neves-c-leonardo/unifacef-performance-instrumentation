@@ -30,6 +30,33 @@ client.on('error', (err) => console.log('Redis Client Error', err));
 client.connect().then(() => console.log('Redis Conectado'));
 const REDISCACHEKEY = 'get-api';
 
+const bunyan = require('bunyan');
+const log = bunyan.createLogger({ name: 'app2' });
+
+app.use((req, res, next) => {
+  const logRequest = {
+    method: req.method,
+    url: req.url,
+    headers: JSON.stringify(req.headers),
+    params: JSON.stringify(req.params),
+    query: JSON.stringify(req.query),
+    body: JSON.stringify(req.body)
+  }
+
+  const logResponse = {
+    headers: JSON.stringify(res.getHeaders()),
+    statusCode: res.statusCode
+  }
+
+
+  log.info({ 
+    req: logRequest,
+    res: logResponse
+  });
+  next();
+  
+});
+
 async function requestFallbackRedis () {
   console.info('Fallback Executado');
   let response = {
