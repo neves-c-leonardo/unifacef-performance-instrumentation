@@ -41,6 +41,14 @@ services:
       - app1_instancia2
     networks:
       - app-network
+
+  redis:
+    image: redis:alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
   
   app2_instancia1:
     build:
@@ -53,6 +61,8 @@ services:
     environment:
       PORT: 3000
       NGINX_URL: "http://nginx:80"
+      REDIS_HOST: "redis"
+      REDIS_PORT: "6379"
     depends_on:
       - nginx
     networks:
