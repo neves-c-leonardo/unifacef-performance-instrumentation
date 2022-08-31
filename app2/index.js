@@ -1,3 +1,4 @@
+require('newrelic');
 const express = require('express');
 const requestPromise = require('request-promise');
 const app = express();
@@ -16,7 +17,7 @@ const breaker = new CircuitBreaker(requestRetry, circuitBreakerOptions);
 breaker.on('open', () => console.log(`OPEN: The breaker`));
 breaker.on('halfOpen', () => console.log(`HALF_OPEN: The breaker`));
 breaker.on('close', () => console.log(`CLOSE: The breaker`));
-breaker.fallback(requestFallbackRedis); // MODIFIED CODE
+breaker.fallback(requestFallbackRedis);
 
 const redis = require("redis");
 const redisHost = process.env.REDIS_HOST || 'localhost';
@@ -43,7 +44,6 @@ async function requestFallbackRedis () {
   try {
     const responseRedis = await client.get(REDISCACHEKEY);
     if(responseRedis) {
-      console.info('Retornando Fallback através do redis');
       response = JSON.parse(responseRedis);
     }
   } catch(err) {

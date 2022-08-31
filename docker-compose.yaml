@@ -12,6 +12,8 @@ services:
     environment:
       PORT: 3000
       IS_RETURN_200: 1
+    env_file:
+      - ./app1/.env
     networks:
       - app-network
   
@@ -26,6 +28,8 @@ services:
     environment:
       PORT: 3000
       IS_RETURN_200: 0
+    env_file:
+      - ./app1/.env
     networks:
       - app-network
   
@@ -41,7 +45,7 @@ services:
       - app1_instancia2
     networks:
       - app-network
-
+  
   redis:
     image: redis:alpine
     restart: always
@@ -63,8 +67,11 @@ services:
       NGINX_URL: "http://nginx:80"
       REDIS_HOST: "redis"
       REDIS_PORT: "6379"
+    env_file:
+      - ./app2/.env
     depends_on:
       - nginx
+      - redis
     networks:
       - app-network
 
